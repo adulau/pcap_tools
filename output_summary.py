@@ -29,13 +29,15 @@ def main():
         print "\n== Request Dump ==\n"
         for info in miner.get_http_request_data():
             for key, value in info.items():
-	            print(key + " - " + value)
+                print(key + " - " + value)
             print("\n")
 
         print "\n== Flows ==\n"
         for info in miner.get_flows():
             print(info)
 
+        print "\n== TTL distribution ==\n"
+        print miner.get_ttl_distribution()
     else:
         oParser.print_help()
         return

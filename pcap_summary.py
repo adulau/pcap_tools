@@ -51,6 +51,13 @@ def generate(infile, outfile):
         f.write(info + "\n")
     f.close()
 
+    #TTL distribution
+    f = open(outfile + "ttl_distribution.txt","w")
+    for i in xrange(0,255):
+        f.write(str(i)+",")
+    f.write("\n"+str(','.join(map(str,miner.get_ttl_distribution()))))
+    f.close()
+
 def main():
     oParser = optparse.OptionParser(usage='usage: %prog [options]\n' + __description__, version='%prog ' + __version__)
     oParser.add_option('-f', '--file', type='string', help='input PCAP file for processing')

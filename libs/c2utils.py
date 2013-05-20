@@ -26,6 +26,7 @@ class pcap_miner():
         self._destination_ips = []
         self._source_ip_details = []
         self._destination_ip_details = []
+        self._ttl_distribution = [0] * 255
         self._dns_request_data = []
         self._flows = []
         self._packet_count = 0
@@ -70,6 +71,7 @@ class pcap_miner():
                 destination_ip = self.unpack_ip(ip.dst)
                 self._source_ips.append(source_ip)
                 self._destination_ips.append(destination_ip)
+                self._ttl_distribution[ip.ttl] += 1
             except Exception, e:
                 continue
 
@@ -121,6 +123,9 @@ class pcap_miner():
 
     def get_source_ips(self):
         return self.quick_unique(self._source_ips)
+
+    def get_ttl_distribution(self):
+        return self._ttl_distribution
 
     def get_source_ip_details(self):
         ulist = self.quick_unique(self._source_ips)
@@ -202,12 +207,12 @@ class pcap_miner():
             self._dns_json.append({"type": dns["type"], "request": dns["request"], "response": dns["response"]})
             
 	for ip in self.get_destination_ip_details():
-	    self._dest_json.append({"ip_address" : ip['ip_address'], "owner": ip['owner'], "asn": ip['asn'], "netblock": ip['block']})   
+	    self._dest_json.append({"ip_address" : ip['ip_address'], "owner": ip['owner'], "asn": ip['asn'], "netblock": ip['block']})
 	    
 	for info in self.get_http_request_data():
 	    tmp = {}
 	    for key, value in info.items():
-		tmp[key] = value	    
+		tmp[key] = value
 	    self._http_json.append(tmp)
 
 	for flow in self.get_flows():
@@ -222,7 +227,8 @@ class pcap_miner():
 	       "destination_ip_details":self._dest_json,
 	       "http_requests":self._http_json,
 	       "flows":self._flow_json,
-	       "counts":self._counts_json
+	       "counts":self._counts_json,
+           "ttl_distribution":self._ttl_distribution
 	       }
 	
 	return json.dumps(obj)
